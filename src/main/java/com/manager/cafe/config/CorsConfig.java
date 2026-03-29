@@ -17,7 +17,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "http://localhost:8081"
+                "http://localhost:8081",
+                "https://cafe-frontend-sable.vercel.app"
         ));
 
         config.setAllowedMethods(List.of(
