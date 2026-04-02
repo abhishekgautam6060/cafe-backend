@@ -37,6 +37,12 @@ public class OrderController {
         return service.getOrdersByUser(email);
     }
 
+    @GetMapping("/today")
+    public List<Order> getTodayOrders(Authentication auth) {
+        String email = auth.getName();
+        return service.getTodayOrders(email);
+    }
+
     @PostMapping("/{orderId}/items")
     public Order addItem(Authentication auth,  @PathVariable Long orderId, @RequestBody OrderItem item) {
         String email = auth.getName();

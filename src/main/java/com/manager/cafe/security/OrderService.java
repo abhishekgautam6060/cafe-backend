@@ -102,4 +102,8 @@ public class OrderService {
 
         return orderRepo.save(order);
     }
+
+    public List<Order> getTodayOrders (String email){
+        return orderRepo.getTodayOrdersByEmail(email);
+    }
 }

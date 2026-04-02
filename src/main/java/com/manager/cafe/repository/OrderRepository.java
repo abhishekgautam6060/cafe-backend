@@ -2,6 +2,8 @@ package com.manager.cafe.repository;
 
 import com.manager.cafe.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,4 +11,12 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserEmail(String email);
+
+    @Query(value = """
+        SELECT *  FROM orders WHERE created_at >= CURDATE()
+        AND created_at < CURDATE() + INTERVAL 1 DAY
+        AND user_email = :email
+        """, nativeQuery = true)
+    List<Order> getTodayOrdersByEmail(@Param("email") String email);
+
 }
