@@ -13,10 +13,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserEmail(String email);
 
     @Query(value = """
-        SELECT *  FROM orders WHERE created_at >= CURDATE()
-        AND created_at < CURDATE() + INTERVAL 1 DAY
-        AND user_email = :email
-        """, nativeQuery = true)
+    SELECT o.* 
+    FROM orders o
+    JOIN users u ON o.user_id = u.id
+    WHERE o.created_at >= CURDATE()
+      AND o.created_at < CURDATE() + INTERVAL 1 DAY
+      AND u.email = :email
+""", nativeQuery = true)
     List<Order> getTodayOrdersByEmail(@Param("email") String email);
 
 }
