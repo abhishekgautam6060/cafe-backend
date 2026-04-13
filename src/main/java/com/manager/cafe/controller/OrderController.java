@@ -2,6 +2,7 @@ package com.manager.cafe.controller;
 
 import com.manager.cafe.entity.Order;
 import com.manager.cafe.entity.OrderItem;
+import com.manager.cafe.repository.OrderRepository;
 import com.manager.cafe.security.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,9 @@ public class OrderController {
 
     @Autowired
     private OrderService service;
+
+    @Autowired
+    private OrderRepository orderRepo;
 
     @PostMapping
     public Order createOrder(
@@ -61,6 +65,16 @@ public class OrderController {
     @PutMapping("/{orderId}/close")
     public Order closeOrder(@PathVariable Long orderId) {
         return service.closeOrder(orderId);
+    }
+
+    @PutMapping("/{orderId}/add-items")
+    public Order addMoreItems(@PathVariable Long orderId) {
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus("ACTIVE"); // ✅ correct way
+
+        return orderRepo.save(order);
     }
 
     @PutMapping("/{orderId}/bill")
