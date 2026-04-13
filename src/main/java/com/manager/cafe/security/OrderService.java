@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -62,6 +63,31 @@ public class OrderService {
         item.setOrder(order); // 🔥 VERY IMPORTANT
 
         order.getItems().add(item);
+
+        return orderRepo.save(order);
+    }
+
+    public Order removeItem(Long orderId, OrderItem item) {
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        List<OrderItem> items = order.getItems();
+
+        for (Iterator<OrderItem> iterator = items.iterator(); iterator.hasNext();) {
+            OrderItem existing = iterator.next();
+
+            if (existing.getItemName().equals(item.getItemName())) {
+
+                if (existing.getQuantity() > 1) {
+                    existing.setQuantity(existing.getQuantity() - 1); // ✅ decrease
+                } else {
+                    iterator.remove(); // ✅ remove item completely
+                }
+
+                break;
+            }
+        }
 
         return orderRepo.save(order);
     }
