@@ -22,6 +22,7 @@ public class OrderController {
             Authentication auth) {
         String email = auth.getName(); // ✅ logged-in user
         System.out.println("Email : " + email);
+        System.out.println("table no " + tableNo);
 
         return service.createOrder(tableNo, email);
     }
@@ -48,6 +49,13 @@ public class OrderController {
         String email = auth.getName();
 
         return service.addItem(orderId, item);
+    }
+
+    @PostMapping("/{orderId}/remove/items")
+    public Order removeItem(Authentication auth,  @PathVariable Long orderId, @RequestBody OrderItem item) {
+        String email = auth.getName();
+
+        return service.removeItem(orderId, item);
     }
 
     @PutMapping("/{orderId}/close")
