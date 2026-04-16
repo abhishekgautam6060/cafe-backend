@@ -6,9 +6,17 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class User {
 
+    public enum Role {
+        ADMIN,
+        CASHIER,
+        WAITER,
+        KITCHEN
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     private String name;
     private String phone;
@@ -17,6 +25,29 @@ public class User {
     private String email;
 
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public Long getId() {
         return id;
@@ -59,8 +90,23 @@ public class User {
     }
 
 
-    public User(Long id, String password, String email, String phone, String name) {
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                ", owner=" + owner +
+                '}';
+    }
+
+    public User(Long id, User owner, Role role, String password, String email, String phone, String name) {
         this.id = id;
+        this.owner = owner;
+        this.role = role;
         this.password = password;
         this.email = email;
         this.phone = phone;
@@ -70,14 +116,4 @@ public class User {
     public User() {
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }

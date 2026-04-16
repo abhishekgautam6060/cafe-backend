@@ -12,6 +12,9 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserEmail(String email);
 
+    List<Order> findByUserOwner_Id(Long ownerId);
+    List<Order> findByOwner_Id(Long ownerId);
+
     @Query(value = """
     SELECT o.* 
     FROM orders o

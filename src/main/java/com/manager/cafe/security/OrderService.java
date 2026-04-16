@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -30,6 +31,11 @@ public class OrderService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        User ownerUser =
+                user.getRole() == User.Role.ADMIN
+                        ? user
+                        : user.getOwner();
+
 
         if (tableNo == null) {
             tableNo = 0L; // ✅ TAKEAWAY SUPPORT
@@ -39,6 +45,7 @@ public class OrderService {
 
         order.setTableNo(tableNo);
         order.setUser(user);
+        order.setOwner(ownerUser);
 
         order.setStatus("ACTIVE"); // ✅ IMPORTANT
         order.setCreatedAt(LocalDateTime.now()); // 🔥 FIX
@@ -48,7 +55,15 @@ public class OrderService {
     }
 
     public List<Order> getOrdersByUser(String email) {
-        return orderRepo.findByUserEmail(email);
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        Long ownerId =
+                user.get().getRole() == User.Role.ADMIN
+                        ? user.get().getId()
+                        : user.get().getOwner().getId();
+
+        return orderRepo.findByOwner_Id(ownerId);
     }
 
     public List<Order> getAllOrders() {

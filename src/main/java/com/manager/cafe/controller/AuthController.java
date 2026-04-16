@@ -6,7 +6,10 @@ import com.manager.cafe.dto.LoginRequest;
 import com.manager.cafe.dto.SignupRequest;
 import com.manager.cafe.entity.User;
 import com.manager.cafe.repository.UserRepository;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +36,7 @@ public class AuthController {
         user.setEmail(req.email);
         user.setPhone(req.phone);
         user.setPassword(encoder.encode(req.password));
+        user.setRole(User.Role.ADMIN);
 
         return repo.save(user);
     }
@@ -43,24 +47,54 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // Login
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
 
-        User user = repo.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = repo.findByEmail(req.getEmail()).orElse(null);
 
-        if (!encoder.matches(req.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+        if (user == null) {
+            return ResponseEntity
+                    .status(401)
+                    .body("User not found ❌");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        if (!encoder.matches(req.getPassword(), user.getPassword())) {
+            return ResponseEntity
+                    .status(401)
+                    .body("Invalid credentials ❌");
+        }
 
-        AuthResponse auth= new AuthResponse();
+        String token = jwtUtil.generateToken(user.getEmail(),user.getRole().name());
+
+        AuthResponse auth = new AuthResponse();
         auth.setToken(token);
+        auth.setRole(user.getRole().name());
         auth.setName(user.getName());
         auth.setEmail(user.getEmail());
-        return auth;
+
+
+        return ResponseEntity.ok(auth);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create-staff")
+    public User createStaff(Authentication auth, @RequestBody SignupRequest req) {
+
+
+        String email = auth.getName();
+        User admin = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        User user = new User();
+        user.setName(req.fullName);
+        user.setEmail(req.email);
+        user.setPhone(req.phone);
+        user.setPassword(encoder.encode(req.password));
+
+        user.setRole(User.Role.valueOf(req.role)); // 🔥 dynamic role
+        user.setOwner(admin); // 🔥 LINK TO ADMIN
+
+        return repo.save(user);
     }
 
     @PutMapping("/me")

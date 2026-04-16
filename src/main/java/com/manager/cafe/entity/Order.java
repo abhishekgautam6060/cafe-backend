@@ -33,18 +33,16 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner; // 🔥 NEW FIELD
 
-    public Order(Long id, User user, List<OrderItem> items, LocalDateTime paidAt, LocalDateTime billedAt, LocalDateTime createdAt, String paymentMethod, Double totalAmount, String status, Long tableNo) {
-        this.id = id;
-        this.user = user;
-        this.items = items;
-        this.paidAt = paidAt;
-        this.billedAt = billedAt;
-        this.createdAt = createdAt;
-        this.paymentMethod = paymentMethod;
-        this.totalAmount = totalAmount;
-        this.status = status;
-        this.tableNo = tableNo;
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public List<OrderItem> getItems() {
@@ -128,6 +126,20 @@ public class Order {
     }
 
 
+    public Order(Long id, Long tableNo, String status, Double totalAmount, String paymentMethod, LocalDateTime createdAt, LocalDateTime billedAt, LocalDateTime paidAt, List<OrderItem> items, User user, User owner) {
+        this.id = id;
+        this.tableNo = tableNo;
+        this.status = status;
+        this.totalAmount = totalAmount;
+        this.paymentMethod = paymentMethod;
+        this.createdAt = createdAt;
+        this.billedAt = billedAt;
+        this.paidAt = paidAt;
+        this.items = items;
+        this.user = user;
+        this.owner = owner;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -141,6 +153,7 @@ public class Order {
                 ", paidAt=" + paidAt +
                 ", items=" + items +
                 ", user=" + user +
+                ", owner=" + owner +
                 '}';
     }
 
