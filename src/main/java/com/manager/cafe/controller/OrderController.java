@@ -31,10 +31,10 @@ public class OrderController {
         return service.createOrder(tableNo, email);
     }
 
-//    @GetMapping
-//    public List<Order> getOrders() {
-//        return service.getAllOrders();
-//    }
+    @GetMapping
+    public List<Order> getOrders() {
+        return service.getAllOrders();
+    }
 
     @GetMapping
     public List<Order> getOrders(Authentication auth) {
