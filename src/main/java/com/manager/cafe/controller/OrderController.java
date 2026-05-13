@@ -5,6 +5,7 @@ import com.manager.cafe.entity.OrderItem;
 import com.manager.cafe.repository.OrderRepository;
 import com.manager.cafe.security.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,18 @@ public class OrderController {
         System.out.println("table no " + tableNo);
 
         return service.createOrder(tableNo, email);
+    }
+
+    @PutMapping("/{id}/prepared")
+    public ResponseEntity<Order> markPrepared(@PathVariable Long id) {
+        Order updatedOrder = service.markAsPrepared(id);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PutMapping("/{id}/active")
+    public ResponseEntity<Order> activeAgain(@PathVariable Long id) {
+        Order updatedOrder = service.activeAgain(id);
+        return ResponseEntity.ok(updatedOrder);
     }
 
 //    @GetMapping

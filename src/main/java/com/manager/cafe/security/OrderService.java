@@ -54,6 +54,26 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
+    public Order markAsPrepared(Long orderId) {
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus("PREPARED");
+
+        return orderRepo.save(order);
+    }
+
+    public Order activeAgain(Long orderId) {
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus("ACTIVE");
+
+        return orderRepo.save(order);
+    }
+
     public List<Order> getOrdersByUser(String email) {
 
         Optional<User> user = userRepository.findByEmail(email);
