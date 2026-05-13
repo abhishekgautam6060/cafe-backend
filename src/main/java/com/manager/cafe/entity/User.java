@@ -8,6 +8,7 @@ public class User {
 
     public enum Role {
         ADMIN,
+        MANAGER,
         CASHIER,
         WAITER,
         KITCHEN
@@ -25,6 +26,8 @@ public class User {
     private String email;
 
     private String password;
+
+    private Integer tableCount;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -89,6 +92,13 @@ public class User {
         this.phone = phone;
     }
 
+    public Integer getTableCount() {
+        return tableCount;
+    }
+
+    public void setTableCount(Integer tableCount) {
+        this.tableCount = tableCount;
+    }
 
     @Override
     public String toString() {
@@ -98,18 +108,20 @@ public class User {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", tableCount=" + tableCount +
                 ", role=" + role +
                 ", owner=" + owner +
                 '}';
     }
 
-    public User(Long id, User owner, Role role, String password, String email, String phone, String name) {
+    public User(Long id, User owner, Role role, String password, Integer tableCount, String phone, String email, String name) {
         this.id = id;
         this.owner = owner;
         this.role = role;
         this.password = password;
-        this.email = email;
+        this.tableCount = tableCount;
         this.phone = phone;
+        this.email = email;
         this.name = name;
     }
 

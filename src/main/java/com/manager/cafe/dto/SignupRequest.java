@@ -5,6 +5,7 @@ public class SignupRequest {
     public String email;
     public String phone;
     public String password;
+    public Integer tableCount;
 
     public String role;
 
@@ -46,5 +47,13 @@ public class SignupRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getTableCount() {
+        return tableCount;
+    }
+
+    public void setTableCount(Integer tableCount) {
+        this.tableCount = tableCount;
     }
 }

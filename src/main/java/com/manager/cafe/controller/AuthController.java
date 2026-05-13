@@ -1,5 +1,6 @@
 package com.manager.cafe.controller;
 
+import com.manager.cafe.config.CafeAccessService;
 import com.manager.cafe.config.JwtUtil;
 import com.manager.cafe.dto.AuthResponse;
 import com.manager.cafe.dto.LoginRequest;
@@ -14,6 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -27,6 +31,9 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private CafeAccessService cafeAccessService;
+
     // Signup
     @PostMapping("/signup")
     public User signup(@RequestBody SignupRequest req) {
@@ -36,6 +43,7 @@ public class AuthController {
         user.setEmail(req.email);
         user.setPhone(req.phone);
         user.setPassword(encoder.encode(req.password));
+        user.setTableCount(req.tableCount);
         user.setRole(User.Role.ADMIN);
 
         return repo.save(user);
@@ -74,6 +82,25 @@ public class AuthController {
 
 
         return ResponseEntity.ok(auth);
+    }
+
+    @GetMapping("/config")
+    public ResponseEntity<?> getCafeConfig(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        User currentUser = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        User cafeOwner =
+                cafeAccessService.getCafeOwner(currentUser);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("cafeName", cafeOwner.getName());
+        response.put("tableCount", cafeOwner.getTableCount());
+
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
