@@ -5,7 +5,9 @@ import com.manager.cafe.config.JwtUtil;
 import com.manager.cafe.dto.AuthResponse;
 import com.manager.cafe.dto.LoginRequest;
 import com.manager.cafe.dto.SignupRequest;
+import com.manager.cafe.entity.Client;
 import com.manager.cafe.entity.User;
+import com.manager.cafe.repository.ClientRepository;
 import com.manager.cafe.repository.UserRepository;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class AuthController {
 
     @Autowired
     private CafeAccessService cafeAccessService;
+
+    @Autowired
+    private ClientRepository clientRepository;
 
     // Signup
     @PostMapping("/signup")
@@ -136,4 +141,22 @@ public class AuthController {
 
         return repo.save(user);
     }
+
+
+
+
+//  this API is for fetching all Super admin clients
+
+    @PostMapping("/client/leads")
+    public ResponseEntity<?> saveLead(
+            @RequestBody Client request
+    ) {
+        return ResponseEntity.ok(clientRepository.save(request));
+    }
+
+    @GetMapping("/client/leads")
+    public ResponseEntity<?> getAllLeads() {
+        return ResponseEntity.ok(clientRepository.findAll());
+    }
+
 }
