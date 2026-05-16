@@ -20,7 +20,9 @@ public class CorsConfig {
                 "http://localhost:8081",
                 "https://cafe-frontend-sable.vercel.app",
                 "https://cafe-manager-ochre.vercel.app",
-                "http://127.0.0.1:5500"
+                "http://127.0.0.1:5500",
+                "https://cafe-manager-owner-tysa.vercel.app",
+                "https://www.cafemanager.online"
         ));
 
         config.setAllowedMethods(List.of(
