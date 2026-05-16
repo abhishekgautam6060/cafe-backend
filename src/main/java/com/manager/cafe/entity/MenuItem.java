@@ -13,17 +13,20 @@ public class MenuItem{
 
     private Double price;
 
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @ManyToOne
     private User user;
 
-    public MenuItem(Long id, User user, String category, Double price, String name) {
-        this.id = id;
-        this.user = user;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
         this.category = category;
-        this.price = price;
-        this.name = name;
     }
 
     public Long getId() {
@@ -42,14 +45,6 @@ public class MenuItem{
         this.user = user;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public Double getPrice() {
         return price;
     }
@@ -66,13 +61,21 @@ public class MenuItem{
         this.name = name;
     }
 
+    public MenuItem(Long id, String name, Double price, Category category, User user) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "MenuItem{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", price=" + price +
-                ", category='" + category + '\'' +
+                ", category=" + category +
                 ", user=" + user +
                 '}';
     }

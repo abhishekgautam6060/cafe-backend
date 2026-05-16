@@ -138,6 +138,7 @@ public class AuthController {
         user.setName(updated.getName());
         user.setEmail(updated.getEmail());
         user.setPhone(updated.getPhone());
+        user.setTableCount(updated.getTableCount());
 
         return repo.save(user);
     }

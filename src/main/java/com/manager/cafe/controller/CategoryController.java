@@ -2,9 +2,9 @@ package com.manager.cafe.controller;
 
 
 import com.manager.cafe.config.CafeAccessService;
-import com.manager.cafe.entity.MenuItem;
+import com.manager.cafe.entity.Category;
 import com.manager.cafe.entity.User;
-import com.manager.cafe.repository.MenuItemRepository;
+import com.manager.cafe.repository.CategoryRepository;
 import com.manager.cafe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/menu")
-public class MenuController {
-
+@RequestMapping("/categories")
+public class CategoryController {
 
     @Autowired
-    private MenuItemRepository menuRepo;
+    private CategoryRepository categoryRepo;
 
     @Autowired
     private UserRepository userRepo;
@@ -26,41 +25,54 @@ public class MenuController {
     @Autowired
     private CafeAccessService cafeAccessService;
 
+    // CREATE CATEGORY
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping
-    public ResponseEntity<?> addMenu(
-            @RequestBody MenuItem item,
+    public ResponseEntity<?> createCategory(
+            @RequestBody Category category,
             Authentication authentication
     ) {
-        String email = authentication.getName();
-        User user = userRepo.findByEmail(email)
-                .orElseThrow();
-        item.setUser(user);
-        return ResponseEntity.ok(
-                menuRepo.save(item)
-        );
-    }
 
-    @GetMapping
-    public ResponseEntity<?> getMenu(
-            Authentication authentication
-    ) {
         String email = authentication.getName();
+
         User currentUser = userRepo.findByEmail(email)
                 .orElseThrow();
 
         User cafeOwner =
                 cafeAccessService.getCafeOwner(currentUser);
+
+        category.setUser(cafeOwner);
+
         return ResponseEntity.ok(
-                menuRepo.findByUser(cafeOwner)
+                categoryRepo.save(category)
         );
     }
 
+    // GET ALL CATEGORIES
+    @GetMapping
+    public ResponseEntity<?> getCategories(
+            Authentication authentication
+    ) {
+
+        String email = authentication.getName();
+
+        User currentUser = userRepo.findByEmail(email)
+                .orElseThrow();
+
+        User cafeOwner =
+                cafeAccessService.getCafeOwner(currentUser);
+
+        return ResponseEntity.ok(
+                categoryRepo.findByUser(cafeOwner)
+        );
+    }
+
+    // UPDATE CATEGORY
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMenuItem(
+    public ResponseEntity<?> updateCategory(
             @PathVariable Long id,
-            @RequestBody MenuItem updatedItem,
+            @RequestBody Category updatedCategory,
             Authentication authentication
     ) {
 
@@ -72,28 +84,25 @@ public class MenuController {
         User cafeOwner =
                 cafeAccessService.getCafeOwner(currentUser);
 
-        MenuItem existingItem = menuRepo.findById(id)
+        Category category = categoryRepo.findById(id)
                 .orElseThrow();
 
-        // SECURITY CHECK
-        if (!existingItem.getUser().getId().equals(cafeOwner.getId())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Unauthorized access");
+        if (!category.getUser().getId().equals(cafeOwner.getId())) {
+            return ResponseEntity.badRequest()
+                    .body("Unauthorized");
         }
 
-        existingItem.setName(updatedItem.getName());
-        existingItem.setPrice(updatedItem.getPrice());
-        existingItem.setCategory(updatedItem.getCategory());
+        category.setName(updatedCategory.getName());
 
         return ResponseEntity.ok(
-                menuRepo.save(existingItem)
+                categoryRepo.save(category)
         );
     }
 
+    // DELETE CATEGORY
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMenuItem(
+    public ResponseEntity<?> deleteCategory(
             @PathVariable Long id,
             Authentication authentication
     ) {
@@ -106,21 +115,18 @@ public class MenuController {
         User cafeOwner =
                 cafeAccessService.getCafeOwner(currentUser);
 
-        MenuItem item = menuRepo.findById(id)
+        Category category = categoryRepo.findById(id)
                 .orElseThrow();
 
-        // SECURITY CHECK
-        if (!item.getUser().getId().equals(cafeOwner.getId())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Unauthorized access");
+        if (!category.getUser().getId().equals(cafeOwner.getId())) {
+            return ResponseEntity.badRequest()
+                    .body("Unauthorized");
         }
 
-        menuRepo.delete(item);
+        categoryRepo.delete(category);
 
         return ResponseEntity.ok(
-                "Menu item deleted successfully"
+                "Category deleted successfully"
         );
     }
-
 }
