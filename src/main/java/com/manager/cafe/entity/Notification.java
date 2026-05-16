@@ -20,6 +20,11 @@ public class Notification {
 
     private LocalDateTime createdAt;
 
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
+
     @ManyToOne
     private User user;
 
@@ -100,6 +105,8 @@ public class Notification {
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
+
+
 
     public Notification(Long id, String redirectTab, String orderId, Integer tableNo, User user, LocalDateTime createdAt, String type, String title, String message) {
         this.id = id;
